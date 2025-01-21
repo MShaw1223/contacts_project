@@ -30,12 +30,12 @@ sendMessage(){
 	read -p "Enter the message: " message_body
 	send_time=$(date)
 
-	if [ ! -d $recipient ]; then
+	if [ ! -d "$mf/$recipient" ]; then
 		mkdir "$mf/$recipient"
 	fi
 
 	base="$mf/$recipient"
-	if [ ! -f $sender ]; then
+	if [ ! -f "$base/$sender" ]; then
 		touch "$base/$sender"
 	fi
 
@@ -87,17 +87,20 @@ viewMessage(){
 				# latest_each+=("$iter_latest")
 			done
 
-			# change back to colon
-			latest=$(echo ${latest_each[0]} | awk -F '|' '{print $1}' | date -d +%s)
-			echo $latest_date
+			latest_unformatted=$(echo ${latest_each[0]} | awk -F : '{print $1}')
+			latest=$(date -d "$latest_unformatted" +%s)
+			latestDates=(["$latest"]=$latest_unformatted)
 			for l in "${latest_each[@]}"; do
-				echo "lat= $latest l=$l"
-				current=$(echo $l | awk -F '|' '{print $1}' | date -d +%s)
+				current_unf=$(echo $l | awk -F : '{print $1}')
+				current=$(date -d "$current_unf" +%s)
+
+				latestDates["$current"]=$l
+
 				if [ $latest -lt $current ];then
 					latest=$current
 				fi
 			done
-			echo $latest;;
+			echo ${latestDates["$latest"]};;
 		*)
 			echo "Incorrect input."
 			return 1;;
