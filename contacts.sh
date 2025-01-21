@@ -143,6 +143,9 @@ viewMessage(){
 		3)
 			# latest chat
 			# tail -n1 for last message
+			if [ ! -d "$sent_base" ]; then
+				echo "No Sent Message History."
+			fi
 			user_chats=$(ls "$sent_base")
 			
 			uc_array=($user_chats)
