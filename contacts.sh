@@ -109,6 +109,11 @@ viewMessage(){
 	echo -e "1. View Sent Messages.\n2. View Recieved Messages.\n3. View latest message."
 	read -p "> " ch
 
+	if [ ! -d "$mf" ]; then
+		echo "No Message History."
+		return 1
+	fi
+
 	senders=$(ls $mf)
 	senders_arr=($senders)
 
@@ -119,19 +124,20 @@ viewMessage(){
 			# sent chats
 			if [ ! -d "$sent_base" ]; then
 				echo "No Sent Message History."
+				return 1
 			fi
 			user_chats=$(ls "$sent_base")
 
 			uc_array=($user_chats)
 
-			for chat in ${user_chats[@]}; do 
+			for chat in "${user_chats[@]}"; do
 				echo "-- Sent to: $chat --"
 				cat "$sent_base/$chat"
 				echo "-- -- -- -- -- -- -- -- --"
 			done;;
 		2)
 			# recieved chats
-			for send in ${senders_arr[@]};do
+			for send in "${senders_arr[@]}";do
 				curr_chat="$mf/$send/$user"
 				if [ -f "$curr_chat" ]; then
 					echo "-- Received from: $send --"
@@ -139,22 +145,18 @@ viewMessage(){
 					echo "-- -- -- -- -- -- --"
 				fi
 			done;;
-		
+
 		3)
 			# latest chat
-			# tail -n1 for last message
-			if [ ! -d "$sent_base" ]; then
-				echo "No Sent Message History."
-			fi
-			user_chats=$(ls "$sent_base")
-			
-			uc_array=($user_chats)
-
 			latest_each=()
-			for chat in ${user_chats[@]}; do 
-				iter_latest=$(tail -n 1 "$sent_base/$chat")
-				latest_each[${#latest_each[@]}]="$iter_latest"
-				# latest_each+=("$iter_latest")
+			for sender in "${senders[@]}"; do
+				chats=$(ls "$mf/$sender")
+				chat_array=($chats)
+
+				for chat in "${chat_array[@]}"; do
+					iter_latest=$(tail -n 1 "$mf/$sender/$chat")
+					latest_each[${#latest_each[@]}]="$iter_latest"
+				done
 			done
 
 			latest_unformatted=$(echo ${latest_each[0]} | awk -F : '{print $1}')
