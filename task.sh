@@ -1,16 +1,27 @@
+#! /bin/bash
+
 source ./contacts.sh
 
 cf="contacts.txt"
-if ! -f $cf; then
+mf="messages"
+if [ ! -f $cf ]; then
 	touch "$cf"
 fi
+if [ ! -d $mf ]; then
+	mkdir "$mf"
+fi
+
 
 while true; do
-	echo -e 1. Add Contactn2. Display Contactsn3. Delete Contactn4. Update Contactn5. Search Contactn6. Send messagen7. View Messagesn8. Quit
+	echo -e "1. Add Contact\n2. Display Contacts\n3. Delete Contact\n4. Update Contact\n5. Search Contact\n6. Send message\n7. View Messages\n8. Quit"
 	read -p  "> " ch
 	 case $ch in
 		 1)
-			 addContact;;
+			 if ! addContact; then
+				 echo "Unable to add Contact"
+			 else
+				 echo "Contact added Successfully!"
+			 fi;;
 		 2)
 			 displayContacts;;
 		 3)
