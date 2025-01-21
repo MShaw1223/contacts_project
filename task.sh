@@ -1,3 +1,5 @@
+source ./contacts.sh
+
 cf="contacts.txt"
 if ! -f $cf; then
 	touch "$cf"
@@ -10,7 +12,7 @@ while true; do
 		 1)
 			 addContact;;
 		 2)
-			 displayContact;;
+			 displayContacts;;
 		 3)
 			 deleteContact;;
 		 4)
