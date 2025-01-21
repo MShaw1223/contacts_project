@@ -67,7 +67,7 @@ updateContact() {
 
 
 searchContact() {
-	read -p "1 Search by name 2 Search by number" ch
+	read -p "1 Search by name 2 Search by number: " ch
                 case $ch in
                         1) read -p "Enter the name for the search: " name
 				if grep -q -i "^$name:" "$cf"; then
@@ -91,16 +91,16 @@ sendMessage(){
 	read -p "Enter the message: " message_body
 	send_time=$(date)
 
-	if [ ! -d "$mf/$recipient" ]; then
-		mkdir "$mf/$recipient"
+	if [ ! -d "$mf/$sender" ]; then
+		mkdir "$mf/$sender"
 	fi
 
-	base="$mf/$recipient"
-	if [ ! -f "$base/$sender" ]; then
-		touch "$base/$sender"
+	base="$mf/$sender"
+	if [ ! -f "$base/$recipient" ]; then
+		touch "$base/$recipient"
 	fi
 
-	echo "$send_time:$message_body" >> "$base/$sender"
+	echo "$send_time:$message_body" >> "$base/$recipient"
 
 	return 0
 }
@@ -109,41 +109,47 @@ viewMessage(){
 	echo -e "1. View Sent Messages.\n2. View Recieved Messages.\n3. View latest message."
 	read -p "> " ch
 
-	recipients=$(ls $mf)
-	recip_arr=($chats)
+	senders=$(ls $mf)
+	senders_arr=($senders)
 
-	recieval_base="$mf/$user"
+	sent_base="$mf/$user"
 
 	case $ch in
 		1)
 			# sent chats
-			for recip in ${recip_arr[@]};do
-				curr_chat="$mf/$recip/$user"
+			if [ ! -d "$sent_base" ]; then
+				echo "No Sent Message History."
+			fi
+			user_chats=$(ls "$sent_base")
+
+			uc_array=($user_chats)
+
+			for chat in ${user_chats[@]}; do 
+				echo "-- Sent to: $chat --"
+				cat "$sent_base/$chat"
+				echo "-- -- -- -- -- -- -- -- --"
+			done;;
+		2)
+			# recieved chats
+			for send in ${senders_arr[@]};do
+				curr_chat="$mf/$send/$user"
 				if [ -f "$curr_chat" ]; then
-					echo "-- Sent to: $recip --"
+					echo "-- Received from: $send --"
 					cat "$curr_chat"
 					echo "-- -- -- -- -- -- --"
 				fi
 			done;;
-		2)
-			user_chats=$(ls "$recieval_base")
-
-			uc_array=($user_chats)
-
-			for chat in ${user_chats[@]}; do 
-				echo "-- Recieved from: $chat --"
-				cat "$recieval_base/$chat"
-				echo "-- -- -- -- -- -- -- -- --"
-			done;;
+		
 		3)
+			# latest chat
 			# tail -n1 for last message
-			user_chats=$(ls "$recieval_base")
-
+			user_chats=$(ls "$sent_base")
+			
 			uc_array=($user_chats)
 
 			latest_each=()
 			for chat in ${user_chats[@]}; do 
-				iter_latest=$(tail -n 1 "$recieval_base/$chat")
+				iter_latest=$(tail -n 1 "$sent_base/$chat")
 				latest_each[${#latest_each[@]}]="$iter_latest"
 				# latest_each+=("$iter_latest")
 			done
