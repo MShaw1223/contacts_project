@@ -102,7 +102,7 @@ sendMessage(){
 		touch "$base/$recipient"
 	fi
 
-	echo "$send_time:$message_body" >> "$base/$recipient"
+	echo "$send_time|$message_body" >> "$base/$recipient"
 
 	return 0
 }
@@ -132,7 +132,7 @@ viewMessage(){
 
 			uc_array=($user_chats)
 
-			for chat in "${user_chats[@]}"; do
+			for chat in ${uc_array[@]}; do
 				echo "-- Sent to: $chat --"
 				cat "$sent_base/$chat"
 				echo "-- -- -- -- -- -- -- -- --"
@@ -151,21 +151,26 @@ viewMessage(){
 		3)
 			# latest chat
 			latest_each=()
-			for sender in "${senders[@]}"; do
-				chats=$(ls "$mf/$sender")
-				chat_array=($chats)
+			for sender in "${senders_arr[@]}"; do
+				if [ -d "$mf/$sender" ]; then
+					chats=$(ls "$mf/$sender")
+					chat_array=($chats)
 
-				for chat in "${chat_array[@]}"; do
-					iter_latest=$(tail -n 1 "$mf/$sender/$chat")
-					latest_each[${#latest_each[@]}]="$iter_latest"
-				done
+					for chat in "${chat_array[@]}"; do
+						iter_latest=$(tail -n 1 "$mf/$sender/$chat")
+						latest_each[${#latest_each[@]}]="$iter_latest"
+					done
+				fi
 			done
 
-			latest_unformatted=$(echo ${latest_each[0]} | awk -F : '{print $1}')
+
+
+			latest_unformatted=$(echo ${latest_each[0]} | awk -F '|' '{print $1}')
 			latest=$(date -d "$latest_unformatted" +%s)
 			latestDates=(["$latest"]=$latest_unformatted)
+
 			for l in "${latest_each[@]}"; do
-				current_unf=$(echo $l | awk -F : '{print $1}')
+				current_unf=$(echo $l | awk -F '|' '{print $1}')
 				current=$(date -d "$current_unf" +%s)
 
 				latestDates["$current"]=$l
