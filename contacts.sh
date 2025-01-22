@@ -1,14 +1,16 @@
 addContact()
 {
         read -p "Enter the name = " name
-        if grep -q "^$name:" "$cf" ;then
-                echo "id = $name alredy exists"
+        if grep -q -i "^$name:" "$cf" ;then
+                echo "Contact $name alredy exists"
+		return 1
         fi
 
         read -p "Enter the number = " number
 
-        if grep -q ",$number," "$cf" ;then
+        if grep -q ":$number" "$cf" ;then
                 echo "$number alredy exists"
+		return 1
         fi
 
         echo "$name:$number" >> "$cf"
