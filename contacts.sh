@@ -53,13 +53,16 @@ updateContact() {
 			1) read -p "Enter the new name: " new_name
 			sed -i "s/^$current_name:$current_phone/$new_name:$current_phone/" "$cf"
                 	echo "Contact name updated successfully.";;
+
 			2) read -p "Enter the new number: " new_number
-                        sed -i "s/^$current_name:$current_phone/$current_name:$new_phone/" "$cf"
+                        sed -i "s/^$current_name:$current_phone/$current_name:$new_number/" "$cf"
                         echo "Contact number updated successfully.";;
+
 			3) read -p "Enter the new name: " new_name
                 	read -p "Enter the new phone: " new_phone
                 	sed -i "s/^$current_name:$current_phone/$new_name:$new_phone/" "$cf"
                 	echo "Contact name and phone updated successfully." ;;
+
 			*) "invalid input! Try again! No updates made!" ;;
 		esac
 	else
